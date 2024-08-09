@@ -86,5 +86,24 @@ AdminMagaRoute.get('/adminmagaroute/new_issue', verifyAdmin, authAdmin, asyncHan
 }))
 
 
+AdminMagaRoute.get('/adminmagaroute/maga_issue/:id', verifyAdmin, authAdmin, asyncHandler(async(req, res, next) => {
+
+
+  try {
+    const{id} = req.params
+
+    const singleIssue = await Magazine.findById({_id: id})
+
+    res.json({singleIssue})
+
+
+    
+  } catch (error) {
+    next(error)
+  }
+
+
+}))
+
 
 module.exports = AdminMagaRoute;
