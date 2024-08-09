@@ -8,6 +8,8 @@ const fileUpload = require('express-fileupload')
 const AdminAuthRoute = require('./adminRoutes/AdminAuthRoute')
 const AdminMagaRoute = require('./adminRoutes/AdminMagaRoute')
 const AdminGenreRoute = require('./adminRoutes/AdminGenreRoute')
+const AdminArticleRoute = require('./adminRoutes/AdminArticleRoute')
+const ArticleRoute = require('./publicRoutes/ArticleRoute')
 
 
 mongoose.connect(process.env.MONGO_DEVT_URL)
@@ -43,7 +45,8 @@ db.once('open', function(){
 app.use(AdminAuthRoute)
 app.use(AdminMagaRoute)
 app.use(AdminGenreRoute)
-
+app.use(AdminArticleRoute)
+app.use(ArticleRoute)
 
 
 app.listen(port, () => {
