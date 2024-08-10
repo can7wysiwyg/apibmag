@@ -48,5 +48,29 @@ ArticleRoute.get('/articleroute/article_by_magazineissue/:id', asyncHandler(asyn
 
 
 
+ArticleRoute.get('/articleroute/showing_articles', asyncHandler(async(req, res, next) => {
+
+
+    try {
+   
+         
+
+         const articles = await Article.find().sort({_id: -1}).limit(8)
+
+         res.json({articles})
+
+
+        
+    } catch (error) {
+        next(error)
+    }
+
+
+
+}))
+
+
+
+
 
 module.exports = ArticleRoute

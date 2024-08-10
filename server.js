@@ -10,6 +10,8 @@ const AdminMagaRoute = require('./adminRoutes/AdminMagaRoute')
 const AdminGenreRoute = require('./adminRoutes/AdminGenreRoute')
 const AdminArticleRoute = require('./adminRoutes/AdminArticleRoute')
 const ArticleRoute = require('./publicRoutes/ArticleRoute')
+const GenreRoute = require('./publicRoutes/GenreRoute')
+const MagIssuesRoute = require('./publicRoutes/MagIssuesRoute')
 
 
 mongoose.connect(process.env.MONGO_DEVT_URL)
@@ -47,6 +49,8 @@ app.use(AdminMagaRoute)
 app.use(AdminGenreRoute)
 app.use(AdminArticleRoute)
 app.use(ArticleRoute)
+app.use(GenreRoute)
+app.use(MagIssuesRoute)
 
 
 app.listen(port, () => {
