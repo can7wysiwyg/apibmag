@@ -20,4 +20,23 @@ try {
 
 
 
+GenreRoute.get('/genreroute/get_single_genre/:id', asyncHandler(async(req, res, next) => {
+
+    try {
+        
+        const {id} = req.params
+
+        const category = await ArticleGenre.findById({_id: id})
+    
+        res.json({category})
+        
+    } catch (error) {
+        next(error)
+    }
+    
+    }))
+    
+
+
+
 module.exports = GenreRoute

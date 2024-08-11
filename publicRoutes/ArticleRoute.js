@@ -3,6 +3,7 @@ const asyncHandler = require('express-async-handler')
 const Article = require('../models/ArticleModel')
 
 
+
 ArticleRoute.get('/articleroute/articles_by_magazineissue/:id', asyncHandler(async(req, res, next) => {
 
 
@@ -69,6 +70,26 @@ ArticleRoute.get('/articleroute/showing_articles', asyncHandler(async(req, res, 
 
 }))
 
+
+
+ArticleRoute.get('/articleroute/articles_by_genre/:id', asyncHandler(async(req, res, next) => {
+
+
+    try {
+
+        const{id} = req.params
+         
+        const articlesByGenre = await Article.find({articleCategory: id})
+
+        res.json({articlesByGenre})
+
+        
+    } catch (error) {
+        next(error)
+    }
+
+
+}))
 
 
 
