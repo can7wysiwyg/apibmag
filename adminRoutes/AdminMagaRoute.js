@@ -1,5 +1,6 @@
 const AdminMagaRoute = require("express").Router();
 const Magazine = require("../models/MagazineModel");
+const Article = require("../models/ArticleModel");
 const asyncHandler = require("express-async-handler");
 const verifyAdmin = require("../middleware/verifyAdmin");
 const authAdmin = require("../middleware/authAdmin");
@@ -105,5 +106,48 @@ AdminMagaRoute.get('/adminmagaroute/maga_issue/:id', verifyAdmin, authAdmin, asy
 
 }))
 
+
+AdminMagaRoute.put('/adminmagaroute/update_magazine_issue/:id', verifyAdmin, authAdmin, asyncHandler(async(req, res, next) => {
+
+
+  try {
+    const {id} = req.params
+
+    const { magazineIssue } = req.body;
+
+    await Magazine.updateOne({ _id: id }, { $set: { magazineIssue } });
+
+    res.json({ msg: "successfully updated.." });
+    
+  } catch (error) {
+    next(error)
+  }
+
+
+}) )
+
+
+AdminMagaRoute.delete('/adminmagaroute/delete_magazine_issue/:id', verifyAdmin, authAdmin, asyncHandler(async(req, res, next) => {
+
+
+  try {
+    
+    const{id} = req.params
+
+    await Magazine.findByIdAndDelete(id)
+
+    await Article.deleteMany({articleIssueMonthRef: id})
+
+
+    res.json({msg: "successfully deleted"})
+
+
+  } catch (error) {
+    next(error)
+  }
+
+
+
+}) )
 
 module.exports = AdminMagaRoute;
