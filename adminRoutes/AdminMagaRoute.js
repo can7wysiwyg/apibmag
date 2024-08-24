@@ -18,6 +18,7 @@ AdminMagaRoute.post(
   "/adminmagaroute/create_magazine",
   verifyAdmin,
   authAdmin,
+  
   asyncHandler(async (req, res, next) => {
     try {
 
@@ -26,20 +27,25 @@ AdminMagaRoute.post(
         if(!magazineIssue) res.json({msg: "magazine name or magazine issue cannot be empty"})
 
 
-            if (!req.files || !req.files.magazinePhoto ) {
+            if (!req.files || !req.files.magazinePhoto || !req.files.magazinePdfFile ) {
                 return res.status(400).json({ message: 'magazine cover photo was not uploaded' });
               }
             
               
               
               const magazinePhotoResult = await cloudinary.uploader.upload(req.files.magazinePhoto.tempFilePath);
-              
+               
+              const pdfFileResult = await cloudinary.uploader.upload(req.files.magazinePdfFile.tempFilePath, {
+                resource_type: 'auto', // Set resource type to "auto" to handle different file types
+              });
+          
               
 
               const magazineSave = new Magazine({
                 
                 magazineIssue,
                 magazinePhoto: magazinePhotoResult.secure_url,
+                magazinePdfFile: pdfFileResult.secure_url
               });
           
               await magazineSave.save();
@@ -47,6 +53,8 @@ AdminMagaRoute.post(
               
               
               fs.unlinkSync(req.files.magazinePhoto.tempFilePath);
+              fs.unlinkSync(req.files.magazinePdfFile.tempFilePath);
+    
     
               
           
@@ -125,6 +133,107 @@ AdminMagaRoute.put('/adminmagaroute/update_magazine_issue/:id', verifyAdmin, aut
 
 
 }) )
+
+
+
+AdminMagaRoute.put('/adminmagaroute/update_magazine_pdf_file/:id', verifyAdmin, authAdmin, asyncHandler(async(req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    const magazine = await Magazine.findById(id);
+    if (!magazine) {
+      return res.status(404).json({ msg: "Magazine not found." });
+    }
+
+    // If there's an existing PDF file, delete it from Cloudinary
+    if (magazine.magazinePdfFile) {
+      const publicId = magazine.magazinePdfFile.split("/").pop().split(".")[0];
+      await cloudinary.uploader.destroy(publicId);
+    }
+
+    // Check if any files are uploaded
+    if (!req.files || Object.keys(req.files).length === 0) {
+      return res.status(400).json({ msg: "No file uploaded." });
+    }
+
+    const magazineFile = req.files.magazinePdfFile;
+
+    // Upload new PDF to Cloudinary
+    const result = await cloudinary.uploader.upload(magazineFile.tempFilePath, {
+      resource_type: 'auto', // Ensure that it's set to auto
+    });
+
+    if (result && result.secure_url) {
+      magazine.magazinePdfFile = result.secure_url;
+      await magazine.save();
+
+      // Clean up temp file
+      fs.unlinkSync(magazineFile.tempFilePath);
+
+      // Return success message with updated magazine
+      res.json({ msg: "Updated successfully.", updatedMagazine: magazine });
+    } else {
+      res.status(500).json({ msg: "Failed to upload PDF file." });
+    }
+
+  } catch (error) {
+    console.error("Error updating magazine PDF file:", error);
+    next(error);
+  }
+}));
+
+
+
+
+
+AdminMagaRoute.put('/adminmagaroute/update_magazine_cover_photo/:id', verifyAdmin, authAdmin, asyncHandler(async(req, res, next) => {
+
+
+  try {
+
+    const {id} = req.params
+
+    const magazine = await Magazine.findById(id);
+    
+          if (!magazine) {
+            return res.status(404).json({ msg: "Magazine not found." });
+          }
+    
+          if (magazine.magazinePhoto) {
+            const publicId = magazine.magazinePhoto.split("/").pop().split(".")[0];
+            await cloudinary.uploader.destroy(publicId);
+          }
+    
+          if (!req.files || Object.keys(req.files).length === 0) {
+            return res.status(400).json({ msg: "No file uploaded." });
+          }
+    
+          const magazinePhoto = req.files.magazinePhoto;
+    
+          const result = await cloudinary.uploader.upload(magazinePhoto.tempFilePath);
+    
+          magazine.magazinePhoto = result.secure_url;
+    
+          await magazine.save();
+    
+          fs.unlinkSync(magazinePhoto.tempFilePath);
+    
+          res.json({ msg: "Magazine picture updated successfully." });
+    
+    
+
+
+
+
+
+    
+  } catch (error) {
+    next(error)
+  }
+
+
+}))
+
 
 
 AdminMagaRoute.delete('/adminmagaroute/delete_magazine_issue/:id', verifyAdmin, authAdmin, asyncHandler(async(req, res, next) => {

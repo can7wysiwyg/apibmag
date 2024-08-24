@@ -153,7 +153,7 @@ AdminArticleRoute.put(
 
       await article.save();
 
-      fs.unlinkSync(bookImage.tempFilePath);
+      fs.unlinkSync(articlePhoto.tempFilePath);
 
       res.json({ msg: "Article picture updated successfully." });
     } catch (error) {

@@ -56,7 +56,7 @@ ArticleRoute.get('/articleroute/showing_articles', asyncHandler(async(req, res, 
    
          
 
-         const articles = await Article.find().sort({_id: -1}).limit(8)
+         const articles = await Article.find().sort({_id: -1})
 
          res.json({articles})
 
