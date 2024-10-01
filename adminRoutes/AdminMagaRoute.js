@@ -14,11 +14,13 @@ cloudinary.config({
   api_secret: process.env.API_SECRET,
 });
 
+
 AdminMagaRoute.post(
   "/adminmagaroute/create_magazine",
-  verifyAdmin,
-  authAdmin,
-  
+   verifyAdmin,
+    authAdmin,
+
+    
   asyncHandler(async (req, res, next) => {
     try {
 
@@ -39,6 +41,7 @@ AdminMagaRoute.post(
                 resource_type: 'auto', // Set resource type to "auto" to handle different file types
               });
           
+            console.log(!req.files.magazinePhoto, !req.files.magazinePdfFile);
               
 
               const magazineSave = new Magazine({
