@@ -186,8 +186,8 @@ AdminMagaRoute.put('/adminmagaroute/update_magazine_pdf_file/:id', verifyAdmin, 
 
 
 
-AdminMagaRoute.put('/adminmagaroute/update_magazine_cover_photo/:id', verifyAdmin, authAdmin, asyncHandler(async(req, res, next) => {
-
+AdminMagaRoute.put('/adminmagaroute/update_magazine_cover_photo/:id', verifyAdmin, authAdmin,  asyncHandler(async(req, res, next) => {
+  // verifyAdmin, authAdmin,
 
   try {
 

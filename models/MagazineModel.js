@@ -10,11 +10,11 @@ const MagazineModel = mongoose.Schema({
 
     magazinePhoto: {
         type: String,
-        required: true
+        
     },
     magazinePdfFile: {
         type: String,
-        required: true
+        
     }
 
 
