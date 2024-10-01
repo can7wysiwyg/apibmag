@@ -50,9 +50,136 @@ AdminVideoRoute.post(
                 msg: 'Video uploaded successfully!'});
         } catch (error) {
             console.error(error);
-            res.status(500).json({ message: 'Failed to upload video.', error: error.message });
+            res.json({ message: 'Failed to upload video.', error: error.message });
         }
     })
 );
+
+AdminVideoRoute.put('/update_video/:id', verifyAdmin, authAdmin, asyncHandler(async(req, res) => {
+
+    
+try {
+    
+} catch (error) {
+
+    console.error(error);
+            res.json({ message: 'Failed to upload video.', error: error.message });
+    
+}
+
+
+}))
+
+
+// verifyAdmin,
+//     authAdmin,
+AdminVideoRoute.put(
+    '/update_video/:id',
+     verifyAdmin,
+   authAdmin,
+
+    
+    asyncHandler(async (req, res) => {
+        try {
+            const videoId = req.params.id;
+
+            // Find the video by ID
+            const video = await Video.findById(videoId);
+            if (!video) {
+                return res.status(404).json({ message: 'Video not found' });
+            }
+
+            // Check if new video file is provided for upload
+            if (req.files && req.files.videoFile) {
+                const videoFile = req.files.videoFile;
+
+                // Upload new video to Cloudinary
+                const videoResult = await cloudinary.uploader.upload(videoFile.tempFilePath, {
+                    resource_type: 'video', // Specify resource type for videos
+                });
+
+                // Update the video link with the new URL
+                video.videoLink = videoResult.secure_url;
+
+                // Clean up temporary file
+                fs.unlinkSync(videoFile.tempFilePath);
+            }
+
+            // Update the video name if provided
+            if (req.body.videoName) {
+                video.videoName = req.body.videoName;
+            }
+
+            // Save the updated video document
+            await video.save();
+
+            res.json({ message: 'Video updated successfully' });
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ message: 'Failed to update video.', error: error.message });
+        }
+    })
+);
+
+
+AdminVideoRoute.put(
+    '/update_video_name/:id',
+    verifyAdmin,
+    authAdmin,
+    asyncHandler(async (req, res) => {
+        try {
+            const videoId = req.params.id;
+            const { videoName } = req.body;
+
+            // Find the video by ID
+            const video = await Video.findById(videoId);
+            if (!video) {
+                return res.status(404).json({ message: 'Video not found' });
+            }
+
+            // Update the video name if provided
+            if (videoName) {
+                video.videoName = videoName;
+            } else {
+                return res.status(400).json({ msg: 'No video name provided' });
+            }
+
+            // Save the updated video document
+            await video.save();
+
+            res.json({ message: 'Video name updated successfully', video });
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ message: 'Failed to update video name.', error: error.message });
+        }
+    })
+);
+
+AdminVideoRoute.delete('/erase_video/:id', verifyAdmin, authAdmin, asyncHandler(async(req, res) => {
+
+
+
+    try {
+
+        const {id} = req.params
+
+        const findVideo = await Video.findById(id)
+
+          if(!findVideo) res.json({msg: "video not found"})
+
+        
+            await Video.findByIdAndDelete(id)
+
+            res.json({msg: "video has been successfully deleted"})
+        
+    } catch (error) {
+
+        console.error(error);
+            res.status(500).json({ message: 'Failed to update video name.', error: error.message });
+        
+
+
+    }
+}))
 
 module.exports = AdminVideoRoute;
