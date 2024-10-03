@@ -1,6 +1,5 @@
 const AdminMagaRoute = require("express").Router();
 const Magazine = require("../models/MagazineModel");
-const Article = require("../models/ArticleModel");
 const asyncHandler = require("express-async-handler");
 const verifyAdmin = require("../middleware/verifyAdmin");
 const authAdmin = require("../middleware/authAdmin");
@@ -248,9 +247,7 @@ AdminMagaRoute.delete('/adminmagaroute/delete_magazine_issue/:id', verifyAdmin, 
 
     await Magazine.findByIdAndDelete(id)
 
-    await Article.deleteMany({articleIssueMonthRef: id})
-
-
+    
     res.json({msg: "successfully deleted"})
 
 

@@ -21,10 +21,6 @@ const ArticleSchema = mongoose.Schema({
     articleCategory: {
         type: String,
         required: true
-    },
-    articleIssueMonthRef: {
-        type: mongoose.Schema.Types.ObjectId, 
-        ref: "Magazine"
     }
 
 

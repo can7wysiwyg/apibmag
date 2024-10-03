@@ -13,12 +13,12 @@ cloudinary.config({
 });
 
 AdminArticleRoute.post(
-  "/adminarticleroute/create_new_article/:id",
+  "/adminarticleroute/create_new_article",
   verifyAdmin,
   authAdmin,
   asyncHandler(async (req, res, next) => {
     try {
-      const { id } = req.params;
+      
       const { articleCategory, articleContent, articleAuthor, articleTitle } =
         req.body;
 
@@ -46,7 +46,7 @@ AdminArticleRoute.post(
         articleCategory,
         articleContent,
         articleTitle,
-        articleIssueMonthRef: id,
+        
         articlePhoto: articlePhotoResult.secure_url,
       });
 

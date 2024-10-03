@@ -3,7 +3,6 @@ const asyncHandler = require('express-async-handler')
 const Article = require('../models/ArticleModel')
 
 
-
 ArticleRoute.get('/articleroute/articles_by_magazineissue/:id', asyncHandler(async(req, res, next) => {
 
 
@@ -26,6 +25,7 @@ ArticleRoute.get('/articleroute/articles_by_magazineissue/:id', asyncHandler(asy
 }))
 
 
+
 ArticleRoute.get('/articleroute/article_by_magazineissue/:id', asyncHandler(async(req, res, next) => {
 
 
@@ -46,6 +46,8 @@ ArticleRoute.get('/articleroute/article_by_magazineissue/:id', asyncHandler(asyn
 
 
 }))
+
+
 
 
 
