@@ -14,6 +14,7 @@ cloudinary.config({
 });
 
 
+
 AdminMagaRoute.post(
   "/adminmagaroute/create_magazine",
    verifyAdmin,
@@ -28,7 +29,7 @@ AdminMagaRoute.post(
         if(!magazineIssue) res.json({msg: "magazine name or magazine issue cannot be empty"})
 
 
-            if (!req.files || !req.files.magazinePhoto || !req.files.magazinePdfFile ) {
+            if (!req.files || !req.files.magazinePhoto  ) {
                 return res.status(400).json({ message: 'magazine cover photo was not uploaded' });
               }
             
@@ -36,18 +37,13 @@ AdminMagaRoute.post(
               
               const magazinePhotoResult = await cloudinary.uploader.upload(req.files.magazinePhoto.tempFilePath);
                
-              const pdfFileResult = await cloudinary.uploader.upload(req.files.magazinePdfFile.tempFilePath, {
-                resource_type: 'auto', // Set resource type to "auto" to handle different file types
-              });
-          
-            console.log(!req.files.magazinePhoto, !req.files.magazinePdfFile);
               
 
               const magazineSave = new Magazine({
                 
                 magazineIssue,
                 magazinePhoto: magazinePhotoResult.secure_url,
-                magazinePdfFile: pdfFileResult.secure_url
+               
               });
           
               await magazineSave.save();
@@ -55,8 +51,7 @@ AdminMagaRoute.post(
               
               
               fs.unlinkSync(req.files.magazinePhoto.tempFilePath);
-              fs.unlinkSync(req.files.magazinePdfFile.tempFilePath);
-    
+              
     
               
           
@@ -76,6 +71,10 @@ AdminMagaRoute.post(
     }
   })
 );
+
+
+
+
 
 
 AdminMagaRoute.get('/adminmagaroute/new_issue', verifyAdmin, authAdmin, asyncHandler(async(req, res, next) => {
