@@ -26,7 +26,8 @@ AdminSubRoute.get('/admin_check_reader/:id', verifyAdmin, authAdmin, asyncHandle
 
 
 
-AdminSubRoute.post('/admin_generate_token', asyncHandler(async(req, res) => {
+
+AdminSubRoute.post('/admin_generate_token', verifyAdmin, authAdmin,  asyncHandler(async(req, res) => {
 
     try {
         const { transactionId, magazineId  } = req.body;

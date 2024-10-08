@@ -48,41 +48,41 @@ ReaderRoute.post('/reader_credentials_submit', asyncHandler(async(req, res) => {
 }))
 
 
-ReaderRoute.get('/reed_magazine_subscribed', asyncHandler(async(req, res) => {
+ReaderRoute.post('/reed_magazine_subscribed', asyncHandler(async(req, res) => {
 
 
     try {
 
-        const { token } = req.body; // Retrieve the token from the request body
+        const { token } = req.body; 
 
         if (!token) {
             return res.status(400).json({ msg: 'Token is required' });
         }
     
-        const [generatedToken, magazineId] = token.split('-'); // Split the token to retrieve parts
+        const [generatedToken, magazineId] = token.split('-'); 
 
 
-                // Find the reader entry matching the token and magazineId
+                
                 const readerEntry = await Reader.findOne({ token: `${generatedToken}-${magazineId}` });
 
-                // Check if the entry exists and if the token has not expired
+                
                 if (!readerEntry) {
-                    return res.status(404).json({ msg: 'Access denied. Invalid token or magazine ID.' });
+                    return res.json({ msg: 'Access denied. Invalid token or magazine ID.' });
                 }
         
                 const currentTime = new Date();
                 if (readerEntry.expiresAt < currentTime) {
-                    return res.status(403).json({ msg: 'Access denied. Token has expired.' });
+                    return res.json({ msg: 'Access denied. Token has expired.' });
                 }
         
-                // If valid, fetch the magazine details using the magazineId
+                
                 const magazine = await Magazine.findById(magazineId);
                 if (!magazine) {
-                    return res.status(404).json({ msg: 'Magazine not found.' });
+                    return res.json({ msg: 'Magazine not found.' });
                 }
         
-                // Send the magazine details to the reader
-                res.json({ msg: 'Access granted', magazine });
+                
+                res.json({magazine});
         
     
 
