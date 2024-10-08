@@ -14,6 +14,8 @@ const GenreRoute = require('./publicRoutes/GenreRoute')
 const MagIssuesRoute = require('./publicRoutes/MagIssuesRoute')
 const AdminVideoRoute = require('./adminRoutes/AdminVideoRoute')
 const VideosRoute = require('./publicRoutes/VideosRoute')
+const ReaderRoute = require('./publicRoutes/ReaderRoute')
+const AdminSubRoute = require('./adminRoutes/AdminSubRoute')
 
 
 mongoose.connect(process.env.MONGO_DEVT_URL)
@@ -55,6 +57,8 @@ app.use(GenreRoute)
 app.use(MagIssuesRoute)
 app.use(AdminVideoRoute)
 app.use(VideosRoute)
+app.use(ReaderRoute)
+app.use(AdminSubRoute)
 
 
 app.listen(port, () => {
