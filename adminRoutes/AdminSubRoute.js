@@ -68,7 +68,7 @@ AdminSubRoute.post('/admin_generate_token', verifyAdmin, authAdmin,  asyncHandle
         }
 
         
-        res.json({ msg: 'Token generated successfully', token, expiresAt });
+        res.json({token, expiresAt, magazineId});
 
 
         
