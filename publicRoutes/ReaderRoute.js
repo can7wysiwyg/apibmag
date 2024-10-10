@@ -2,50 +2,67 @@ const ReaderRoute = require('express').Router()
 const Reader = require('../models/ReaderModel')
 const asyncHandler = require('express-async-handler')
 const Magazine = require('../models/MagazineModel')
+const nodemailer = require('nodemailer');
+
+const transporter = nodemailer.createTransport({
+    service: 'gmail', // or your email service
+    auth: {
+        user: process.env.EMAIL_USER, // your email
+        pass: process.env.EMAIL_PASSWORD  // your email password or app password
+    }
+});
 
 
-
-ReaderRoute.post('/reader_credentials_submit', asyncHandler(async(req, res) => {
-
+const sendEmailToAdmin = async (username, email, phonenumber, transactionId) => {
+    const mailOptions = {
+        from: process.env.EMAIL_USER, // your email
+        to: 'paulkssa@gmail.com', // admin email address
+        subject: 'New Subscription Alert',
+        text: `A new subscription has been made by ${username}.\nEmail: ${email}.\nPhone Number: ${phonenumber}\nTransaction ID: ${transactionId}`
+    };
 
     try {
-
-        const {username, email, phonenumber, transactionId, paymentMethod, magazineId } = req.body
-
-        if(!username) res.json({msg: "username cannot be empty"})
-
-        if(!email) res.json({msg: "email cannot be empty"})
-
-        if(!phonenumber) res.json({msg: "phonenumber cannot be empty"})
-
-        if(!transactionId) res.json({msg: "transaction id cannot be empty"})
-       
-        if(!paymentMethod) res.json({msg: "payment method cannot be empty"})
-
-
-
-      
-       await Reader.create({
-        username,
-        email,
-        phonenumber,
-        transactionId,
-        paymentMethod,
-        magazineId
-       }) 
-       
-       
-       res.json({msg: "you will be emailed a token to use to read the magazine.. please be patient.."})
-    
-    
-
-
-        
+        await transporter.sendMail(mailOptions);
+        console.log('Email sent to admin successfully');
     } catch (error) {
-        res.json({msg: `there was a problem ${error}`})
+        console.error('Error sending email:', error);
     }
+};
 
-}))
+ReaderRoute.post('/reader_credentials_submit', asyncHandler(async (req, res) => {
+    try {
+        const { username, email, phonenumber, transactionId, paymentMethod, magazineId } = req.body;
+
+        // Validation
+        if (!username) return res.json({ msg: "username cannot be empty" });
+        if (!email) return res.json({ msg: "email cannot be empty" });
+        if (!phonenumber) return res.json({ msg: "phonenumber cannot be empty" });
+        if (!transactionId) return res.json({ msg: "transaction id cannot be empty" });
+        if (!paymentMethod) return res.json({ msg: "payment method cannot be empty" });
+
+        // Create Reader
+        const newReader = await Reader.create({
+            username,
+            email,
+            phonenumber,
+            transactionId,
+            paymentMethod,
+            magazineId
+        });
+
+        // Send email to admin
+        await sendEmailToAdmin(username, email, phonenumber, transactionId);
+
+        // Response
+        res.json({ msg: "You will be emailed a token to use to read the magazine.. please be patient.." });
+
+    } catch (error) {
+        res.json({ msg: `There was a problem ${error}` });
+    }
+}));
+
+
+
 
 
 ReaderRoute.post('/reed_magazine_subscribed', asyncHandler(async(req, res) => {
