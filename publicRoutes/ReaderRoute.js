@@ -73,7 +73,7 @@ ReaderRoute.post('/reed_magazine_subscribed', asyncHandler(async(req, res) => {
         const { token } = req.body; 
 
         if (!token) {
-            return res.status(400).json({ msg: 'Token is required' });
+            return res.json({ msg: 'Token is required' });
         }
     
         const [generatedToken, magazineId] = token.split('-'); 
@@ -99,7 +99,7 @@ ReaderRoute.post('/reed_magazine_subscribed', asyncHandler(async(req, res) => {
                 }
         
                 
-                res.json({magazine});
+                res.json({magazine, readerEntry});
         
     
 
@@ -109,6 +109,26 @@ ReaderRoute.post('/reed_magazine_subscribed', asyncHandler(async(req, res) => {
         res.json({msg: `there was a problem: ${error}`})
     }
 
+
+}))
+
+
+ReaderRoute.get('/find_by_token/:token', asyncHandler(async(req, res) => {
+
+try {
+
+    const {token} = req.params
+
+    const item = await Reader.findOne({token})
+
+    res.json({item})
+
+
+    
+} catch (error) {
+    res.json({msg: `there was a problem: ${error}`})
+    
+}
 
 }))
 
