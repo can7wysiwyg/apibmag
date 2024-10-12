@@ -58,7 +58,8 @@ AdminSubRoute.post('/admin_generate_token', verifyAdmin, authAdmin, asyncHandler
         const randomToken = crypto.randomBytes(16).toString('hex');
         const token = `${randomToken}-${magazineId}`;
         const expiresAt = new Date();
-        expiresAt.setDate(expiresAt.getDate() + 7); // Set expiration to 7 days from now
+        // expiresAt.setDate(expiresAt.getDate() + 7); 
+        expiresAt.setMinutes(expiresAt.getMinutes() + 15)
 
 
         const updatedReader = await Reader.findOneAndUpdate(
