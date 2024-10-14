@@ -19,7 +19,17 @@ const sendEmailToAdmin = async (username, email, phonenumber, transactionId) => 
         to: 'paulkssa@gmail.com', // admin email address
         subject: 'New Video Subscription Alert',
         text: `A new video subscription has been made by ${username}.\nEmail: ${email}.\nPhone Number: ${phonenumber}\nTransaction ID: ${transactionId}`
-    }; }
+    }; 
+
+    try {
+        await transporter.sendMail(mailOptions);
+        console.log('Email sent to admin successfully');
+    } catch (error) {
+        console.error('Error sending email:', error);
+    }
+
+
+}
 
 
 

@@ -25,12 +25,12 @@ AdminVideoSubRoute.get('/video_subscriptions_all', verifyAdmin, authAdmin, async
 
 
 
-AdminVideoSubRoute.get('/video_subscription_single/:id', verifyAdmin, authAdmin, asyncHandler(async(requestAnimationFrame, res) => {
+AdminVideoSubRoute.get('/video_subscription_single/:id', verifyAdmin, authAdmin, asyncHandler(async(req, res) => {
 
 
     try {
 
-        const {id} = requestAnimationFrame.params
+        const {id} = req.params
 
         const subscribedVideo = await VideoSub.findById({_id: id})
 
