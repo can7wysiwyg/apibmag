@@ -17,8 +17,8 @@ const sendEmailToAdmin = async (username, email, phonenumber, transactionId) => 
     const mailOptions = {
         from: process.env.EMAIL_USER, // your email
         to: 'paulkssa@gmail.com', // admin email address
-        subject: 'New Subscription Alert',
-        text: `A new subscription has been made by ${username}.\nEmail: ${email}.\nPhone Number: ${phonenumber}\nTransaction ID: ${transactionId}`
+        subject: 'New Magazibe Subscription Alert',
+        text: `A new magazine subscription has been made by ${username}.\nEmail: ${email}.\nPhone Number: ${phonenumber}\nTransaction ID: ${transactionId}`
     };
 
     try {

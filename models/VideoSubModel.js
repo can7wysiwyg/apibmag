@@ -1,7 +1,8 @@
-const mongoose = require('mongoose');
-const { Schema } = mongoose;
+const mongoose = require('mongoose')
 
-const readerSchema = new Schema({
+
+const VideoSubSchema =  mongoose.Schema({
+
     username: {
         type: String,
         required: true
@@ -30,14 +31,16 @@ const readerSchema = new Schema({
         type: String, 
         required: true
     },
-    magazineId: { 
+    videoId: { 
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Magazine', 
+        ref: 'Video', 
         required: true 
     }
 
-}, { timestamps: true });
 
-const Reader = mongoose.model('Reader', readerSchema);
 
-module.exports = Reader;
+}, {
+    timestamps: true
+})
+
+module.exports = mongoose.model('VideoSub', VideoSubSchema)
