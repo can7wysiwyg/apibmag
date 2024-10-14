@@ -45,7 +45,7 @@ const sendEmailToAdmin = async (username, email, phonenumber, transactionId) => 
             if (!paymentMethod) return res.json({ msg: "payment method cannot be empty" });
     
             // Create Reader
-            const newVideoSub = await Reader.create({
+             await VideoSub.create({
                 username,
                 email,
                 phonenumber,
@@ -81,7 +81,7 @@ const sendEmailToAdmin = async (username, email, phonenumber, transactionId) => 
     
     
                     
-                    const watcherEntry = await Reader.findOne({ token: `${generatedToken}-${videoId}` });
+                    const watcherEntry = await VideoSub.findOne({ token: `${generatedToken}-${videoId}` });
     
                     
                     if (!watcherEntry) {
@@ -94,13 +94,13 @@ const sendEmailToAdmin = async (username, email, phonenumber, transactionId) => 
                     }
             
                     
-                    const video = await Video.findById(videoId);
-                    if (!video) {
+                    const videoSubscribed = await Video.findById(videoId);
+                    if (!videoSubscribed) {
                         return res.json({ msg: 'Video not found.' });
                     }
             
                     
-                    res.json({video, watcherEntry});
+                    res.json({videoSubscribed, watcherEntry});
             
         
     

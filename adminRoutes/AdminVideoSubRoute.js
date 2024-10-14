@@ -44,7 +44,7 @@ AdminVideoSubRoute.get('/video_subscription_single/:id', verifyAdmin, authAdmin,
 }))
 
 
-AdminVideoSubRoute.post('/video_sub_generate_token', verifyAdmin, authAdmin, asyncHandler(async(requestAnimationFrame, res) => {
+AdminVideoSubRoute.post('/video_sub_generate_token', verifyAdmin, authAdmin, asyncHandler(async(req, res) => {
 
 
     try {
