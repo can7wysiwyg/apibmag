@@ -25,7 +25,7 @@ VideosRoute.get(
         try {
             const video = await Video.findById(id);
             if (!video) {
-                return res.status(404).json({ message: 'Video not found.' });
+                return res.json({ message: 'Video not found.' });
             }
             res.json({video});
         } catch (error) {
@@ -34,5 +34,25 @@ VideosRoute.get(
         }
     })
 );
+
+
+VideosRoute.get(
+    '/videos_by_genre/:id',
+    asyncHandler(async (req, res) => {
+        const { id } = req.params;
+
+        try {
+            const videosByGenre = await Video.find({videoGenre: id});
+            if (!videosByGenre) {
+                return res.json({ message: ' not found.' });
+            }
+            res.json({videosByGenre});
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ message: 'Failed to retrieve video.', error: error.message });
+        }
+    })
+);
+
 
 module.exports = VideosRoute;

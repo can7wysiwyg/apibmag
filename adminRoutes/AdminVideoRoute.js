@@ -37,7 +37,8 @@ AdminVideoRoute.post(
             // Create a new Video document
             const video = new Video({
                 videoLink: videoResult.secure_url,
-                videoName: req.body.videoName, // Expecting video name in the body
+                videoName: req.body.videoName, 
+                videoGenre: req.body.videoGenre
             });
 
             // Save the video document to the database

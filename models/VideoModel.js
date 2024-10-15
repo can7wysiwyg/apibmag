@@ -6,6 +6,11 @@ const VideosSchema = mongoose.Schema({
         type: String,
         
     },
+    videoGenre : {
+
+        type: String,
+        required: true
+    },
 
     videoName: {
         type: String,
