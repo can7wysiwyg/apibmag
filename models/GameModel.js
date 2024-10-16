@@ -14,7 +14,7 @@ const GameSchema = mongoose.Schema({
         required: true
     },
 
-    LeagueName: {
+    leagueName: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'League',
         required: true
@@ -27,7 +27,7 @@ const GameSchema = mongoose.Schema({
 
     gameResult: {
         type: String,
-        required: true
+        default: null
     }
 
 

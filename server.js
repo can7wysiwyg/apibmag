@@ -18,6 +18,7 @@ const ReaderRoute = require('./publicRoutes/ReaderRoute')
 const AdminSubRoute = require('./adminRoutes/AdminSubRoute')
 const AdminVideoSubRoute = require('./adminRoutes/AdminVideoSubRoute')
 const VideoSubsRoute = require('./publicRoutes/VideoSubsRoute')
+const AdminSoccerRoute = require('./adminRoutes/AdminSoccerRoute')
 
 
 mongoose.connect(process.env.MONGO_DEVT_URL)
@@ -63,6 +64,7 @@ app.use(ReaderRoute)
 app.use(AdminSubRoute)
 app.use(AdminVideoSubRoute)
 app.use(VideoSubsRoute)
+app.use(AdminSoccerRoute)
 
 app.listen(port, () => {
     console.log(`Your server is now running on port ${port}`);

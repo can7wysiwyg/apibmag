@@ -41,7 +41,7 @@ ReaderRoute.post('/reader_credentials_submit', asyncHandler(async (req, res) => 
         if (!paymentMethod) return res.json({ msg: "payment method cannot be empty" });
 
         // Create Reader
-        const newReader = await Reader.create({
+         await Reader.create({
             username,
             email,
             phonenumber,
