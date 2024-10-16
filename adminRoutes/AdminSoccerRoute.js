@@ -71,16 +71,17 @@ try {
    
    try {
 
-    const {teamOne, teamTwo, leagueName, gameVenue} = req.body
+    const {teamOne, teamTwo, leagueName, gameTime, gameVenue} = req.body
 
-    if(!gameVenue || !teamOne || !teamTwo || !leagueName) res.json({msg: "cannot be blank"})
+    if(!gameVenue || !teamOne || !teamTwo || !leagueName  || !gameTime) res.json({msg: "cannot be blank"})
 
 
         await Game.create({
             teamOne,
             teamTwo,
             leagueName,
-            gameVenue
+            gameVenue,
+            gameTime
         })
 
 

@@ -24,6 +24,11 @@ const GameSchema = mongoose.Schema({
         required: true
 
     },
+    gameTime: {
+        type: Date,
+        required: true
+
+    },
 
     gameResult: {
         type: String,
