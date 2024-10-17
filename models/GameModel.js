@@ -25,7 +25,7 @@ const GameSchema = mongoose.Schema({
 
     },
     gameTime: {
-        type: Date,
+        type: String,
         required: true
 
     },

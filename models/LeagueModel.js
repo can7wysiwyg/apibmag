@@ -7,7 +7,11 @@ const LeagueSchema = mongoose.Schema({
         unique: true,
         required: true
     },
-    leagueDuration: {
+    startDate: {
+        type: String,
+        required: true 
+    },
+    endDate: {
         type: String,
         required: true 
     }
