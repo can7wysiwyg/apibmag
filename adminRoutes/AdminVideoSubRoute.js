@@ -124,7 +124,7 @@ async function deleteExpiredVideoSubscriptions() {
 
 
 
-setInterval(deleteExpiredVideoSubscriptions, 6000);
+setInterval(deleteExpiredVideoSubscriptions, 12000);
 
 
 

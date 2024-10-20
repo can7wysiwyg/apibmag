@@ -67,68 +67,90 @@ app.use(SoccerRoute);
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 
+
 // Store connected clients
 const clients = new Map();
 
-// Handle WebSocket connections
+
+let logMessages = [];
+const maxLogs = 100; // Limit the number of logs stored
+
 wss.on('connection', (ws) => {
   console.log('New WebSocket connection established');
 
   ws.on('message', async (message) => {
     const data = JSON.parse(message);
-
-    // When a game starts
-    if (data.action === 'startGame') {
-      const { gameId } = data;
-
-      // Load the game from the database
-      const game = await Game.findById(gameId).populate(['teamOne', 'teamTwo', 'leagueName']);
-      if (!game) {
-        ws.send(JSON.stringify({ error: 'Game not found' }));
-        return;
-      }
-
-      // Add the client to the list of subscribers for the game
-      clients.set(ws, gameId);
-
-      // Broadcast the initial game state to the connected client
-      ws.send(JSON.stringify({ action: 'gameState', game }));
-
-      // Optionally, you can start a timer or manage game state here
+    const logMessage = `Received message: ${JSON.stringify(data)}`;
+    console.log(logMessage);
+    
+    // Store the log message
+    logMessages.push(logMessage);
+    if (logMessages.length > maxLogs) {
+      logMessages.shift(); // Remove the oldest log if limit is reached
     }
 
-    // Handle updates, goals, etc., based on future messages
+    if (data.action === 'startGame') {
+      const { gameId } = data;
+      console.log(`Client subscribed to game ID: ${gameId}`);
+      logMessages.push(`Client subscribed to game ID: ${gameId}`);
+      if (logMessages.length > maxLogs) {
+        logMessages.shift(); // Remove the oldest log if limit is reached
+      }
+
+      clients.set(ws, gameId);
+    }
   });
 
   ws.on('close', () => {
     console.log('WebSocket connection closed');
-    clients.delete(ws); // Remove client from tracking
+    clients.delete(ws);
   });
 });
 
-// Broadcasting game state updates
-const broadcastGameUpdate = (gameId, updatedGameData) => {
-  // Send updates to all clients connected to the specific game
-  clients.forEach((subscribedGameId, client) => {
-    if (subscribedGameId === gameId && client.readyState === WebSocket.OPEN) {
-      client.send(JSON.stringify({ action: 'gameUpdate', game: updatedGameData }));
-    }
-  });
-};
+// API route to get log messages
+app.get('/api/logs', (req, res) => {
+  res.json(logMessages);
+});
 
-// Update game state (for example, when a goal is scored)
-const updateGameState = async (gameId, scoreUpdate) => {
-  const game = await Game.findById(gameId);
-  if (!game) return;
 
-  // Apply score update or any other change
-  game.teamOneScore = scoreUpdate.teamOneScore;
-  game.teamTwoScore = scoreUpdate.teamTwoScore;
-  await game.save();
 
-  // Broadcast the updated game to all connected clients
-  broadcastGameUpdate(gameId, game);
-};
+
+
+// Handle WebSocket connections
+
+// wss.on('connection', (ws) => {
+//   console.log('New WebSocket connection established');
+
+//   ws.on('message', async (message) => {
+//     const data = JSON.parse(message);
+//      console.log(`Received message: ${JSON.stringify(data)}`)
+
+    
+
+
+    
+
+//     if (data.action === 'startGame') {
+//       const { gameId } = data;
+//       console.log(`Client subscribed to game ID: ${gameId}`);
+
+      
+//       clients.set(ws, gameId);
+
+      
+//     }
+
+    
+//   });
+
+//   ws.on('close', () => {
+//     console.log('WebSocket connection closed');
+//     clients.delete(ws);
+//   });
+// });
+
+
+
 
 // Start the server
 server.listen(port, () => {
