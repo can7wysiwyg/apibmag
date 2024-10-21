@@ -8,6 +8,7 @@ const fileUpload = require('express-fileupload');
 const http = require('http'); // Import http for WebSocket
 const WebSocket = require('ws'); // Import WebSocket
 const Game = require('./models/GameModel'); // Assuming Game model is in ./models/Game
+const asyncHandler = require('express-async-handler')
 
 // Routes
 const AdminAuthRoute = require('./adminRoutes/AdminAuthRoute');
@@ -94,7 +95,7 @@ wss.on('connection', (ws) => {
       console.log(`Client subscribed to game ID: ${gameId}`);
       logMessages.push(`Client subscribed to game ID: ${gameId}`);
       if (logMessages.length > maxLogs) {
-        logMessages.shift(); // Remove the oldest log if limit is reached
+        logMessages.shift(); 
       }
 
       clients.set(ws, gameId);
@@ -107,47 +108,85 @@ wss.on('connection', (ws) => {
   });
 });
 
-// API route to get log messages
+
 app.get('/api/logs', (req, res) => {
   res.json(logMessages);
 });
 
 
 
+let gameTimers = {};
+
+// Helper function to calculate elapsed time in "MM:SS" format
+function getElapsedTime(startTime) {
+  const currentTime = new Date();
+  const diffMs = currentTime - startTime;
+  const diffSeconds = Math.floor(diffMs / 1000);
+  const minutes = Math.floor(diffSeconds / 60);
+  const seconds = diffSeconds % 60;
+  return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+}
+
+// Polling API to return game times
+app.get('/api/game_times', (req, res) => {
+  // Log all entries before processing
+  logMessages.forEach((log, index) => {
+    console.log(`Log entry ${index}:`, log);
+  });
+
+  // Process log messages and start timers if not already running
+  logMessages.forEach(log => {
+    try {
+      console.log('Raw log message:', log); // Log the raw message
+
+      // Ensure log is a string
+      if (typeof log !== 'string') {
+        throw new Error("Log message is not a string");
+      }
+
+      // Check if the log message starts with the expected prefix
+      if (!log.startsWith('Received message: ')) {
+        console.log('Skipping malformed log message:', log);
+        return; // Skip to the next iteration
+      }
+
+      const parts = log.split('Received message: ');
+      console.log('Split parts:', parts); // Log the split parts
+
+      // Check if we have a valid message part
+      if (parts.length < 2 || !parts[1]) {
+        throw new Error("Log message part is undefined or malformed");
+      }
+
+      const message = JSON.parse(parts[1]);
+
+      // If action is "startGame", start the timer for that game
+      if (message.action === 'startGame' && !gameTimers[message.gameId]) {
+        gameTimers[message.gameId] = {
+          startTime: new Date(),
+          gameId: message.gameId
+        };
+      }
+    } catch (error) {
+      console.log('Error parsing log message:', error.message, log);
+    }
+  });
+
+  // Prepare game updates with elapsed time
+  const gameUpdates = Object.keys(gameTimers).map(gameId => {
+    const gameTimer = gameTimers[gameId];
+    return {
+      gameId: gameId,
+      elapsedTime: getElapsedTime(gameTimer.startTime)
+    };
+  });
+
+  // Send the game updates (with elapsed time) to the frontend
+  res.json(gameUpdates);
+});
 
 
-// Handle WebSocket connections
 
-// wss.on('connection', (ws) => {
-//   console.log('New WebSocket connection established');
-
-//   ws.on('message', async (message) => {
-//     const data = JSON.parse(message);
-//      console.log(`Received message: ${JSON.stringify(data)}`)
-
-    
-
-
-    
-
-//     if (data.action === 'startGame') {
-//       const { gameId } = data;
-//       console.log(`Client subscribed to game ID: ${gameId}`);
-
-      
-//       clients.set(ws, gameId);
-
-      
-//     }
-
-    
-//   });
-
-//   ws.on('close', () => {
-//     console.log('WebSocket connection closed');
-//     clients.delete(ws);
-//   });
-// });
 
 
 
