@@ -82,7 +82,7 @@ wss.on('connection', (ws) => {
   ws.on('message', async (message) => {
     const data = JSON.parse(message);
     const logMessage = `Received message: ${JSON.stringify(data)}`;
-    console.log(logMessage);
+    // console.log(logMessage);
     
     // Store the log message
     logMessages.push(logMessage);
@@ -127,17 +127,20 @@ function getElapsedTime(startTime) {
   return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
 }
 
+
+
+
 // Polling API to return game times
 app.get('/api/game_times', (req, res) => {
   // Log all entries before processing
   logMessages.forEach((log, index) => {
-    console.log(`Log entry ${index}:`, log);
+    console.log(`Log entry ${index}:`);
   });
 
   // Process log messages and start timers if not already running
   logMessages.forEach(log => {
     try {
-      console.log('Raw log message:', log); // Log the raw message
+      console.log('Raw log message:'); // Log the raw message
 
       // Ensure log is a string
       if (typeof log !== 'string') {
@@ -151,7 +154,7 @@ app.get('/api/game_times', (req, res) => {
       }
 
       const parts = log.split('Received message: ');
-      console.log('Split parts:', parts); // Log the split parts
+      console.log('Split parts:'); // Log the split parts
 
       // Check if we have a valid message part
       if (parts.length < 2 || !parts[1]) {
@@ -168,7 +171,7 @@ app.get('/api/game_times', (req, res) => {
         };
       }
     } catch (error) {
-      console.log('Error parsing log message:', error.message, log);
+      console.log('Error parsing log message:');
     }
   });
 
@@ -186,9 +189,11 @@ app.get('/api/game_times', (req, res) => {
 });
 
 
+ app.get('/app/goal_scorers', (req, res) => {
 
+  res.json(logMessages)
 
-
+ })
 
 
 // Start the server
