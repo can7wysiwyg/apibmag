@@ -9,6 +9,7 @@ const http = require('http'); // Import http for WebSocket
 const WebSocket = require('ws'); // Import WebSocket
 const Game = require('./models/GameModel'); // Assuming Game model is in ./models/Game
 const asyncHandler = require('express-async-handler')
+const GameResult = require('./models/GameResultsModel')
 
 // Routes
 const AdminAuthRoute = require('./adminRoutes/AdminAuthRoute');
@@ -85,7 +86,9 @@ wss.on('connection', (ws) => {
     const data = JSON.parse(message);
 
     // Store the log message
-    const logMessage = `Received message: ${JSON.stringify(data)}`;
+    const logMessage =  JSON.stringify(data);
+
+    
     logMessages.push(logMessage);
     if (logMessages.length > maxLogs) {
       logMessages.shift(); // Remove the oldest log if limit is reached
@@ -95,7 +98,8 @@ wss.on('connection', (ws) => {
     const { action, gameId } = data;
 
     if (action === 'startGame') {
-      console.log(`Game ${gameId} started`);
+    
+      clients.set(ws, gameId)
       if (!gameTimers[gameId]) {
         gameTimers[gameId] = {
           startTime: new Date(),
@@ -128,14 +132,70 @@ wss.on('connection', (ws) => {
     
    
 
-    if (action === 'endGame') {
-    if (gameTimers[gameId]) {
-      console.log(`Game ${gameId} ended`);
-      delete gameTimers[gameId]; // Remove the game timer on end
-      // You may want to notify the client that the game has ended
-      ws.send(JSON.stringify({ action: 'gameEnded', gameId })); // Optional: Notify the client
+   else if (action === 'endGame') {
+    
+       
+    const { gameId } = data; // Extract the game ID from the incoming data
+  
+    // Assuming you have a Game model to query
+    const game = await Game.findById(gameId); // Fetch game details by ID
+
+
+    if (game) {
+      const { leagueName } = game; // Extract the league name
+  
+      // Initialize teams' structures
+      const teamOne = {
+        name: game.teamOne, // Assuming game.teamOne contains the team's name
+        score: 0,
+        scorers: []
+      };
+  
+      const teamTwo = {
+        name: game.teamTwo, // Assuming game.teamTwo contains the team's name
+        score: 0,
+        scorers: []
+      };
+  
+      // Process log messages to get scores and scorers
+      logMessages.forEach(log => {
+        const message = JSON.parse(log);
+        
+        if (message.action === 'updateGoals' && message.gameId === gameId) {
+          // Update scores and scorers based on log message
+          teamOne.score = message.teamOneScore;
+          teamTwo.score = message.teamTwoScore;
+          teamOne.scorers.push(...message.teamOneScorers); // Add scorers
+          teamTwo.scorers.push(...message.teamTwoScorers);
+        }
+      });
+  
+      // Save to the new GameResult model
+      const gameResult = new GameResult({
+        leagueName,
+        teamOne,
+        teamTwo
+      });
+  
+      await gameResult.save();
+
+      await Game.findByIdAndDelete(gameId)
+      console.log(`Game ${gameId} results saved.`);
     }
+  
+  
+
+
+    
+  
+
+
+
+
   }
+
+
+
 }
 
 
@@ -190,16 +250,12 @@ function formatElapsedTime(ms) {
 
 // // Polling API to return game times
 app.get('/api/game_times', (req, res) => {
-  // Log all entries before processing
-  // logMessages.forEach((log, index) => {
-  //   console.log(`Log entry ${index}:`, log);
-  // });
+  
 
   // Process log messages and start timers if not already running
   logMessages.forEach(log => {
     try {
-      // console.log('Raw log message:'); // Log the raw message
-
+    
       // Ensure log is a string
       if (typeof log !== 'string') {
         throw new Error("Log message is not a string");
@@ -207,7 +263,7 @@ app.get('/api/game_times', (req, res) => {
 
       // Check if the log message starts with the expected prefix
       if (!log.startsWith('Received message: ')) {
-        // console.log('Skipping malformed log message:', log);
+      
         return; // Skip to the next iteration
       }
 
