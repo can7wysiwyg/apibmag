@@ -76,37 +76,83 @@ const clients = new Map();
 let logMessages = [];
 const maxLogs = 100; // Limit the number of logs stored
 
+
+
 wss.on('connection', (ws) => {
   console.log('New WebSocket connection established');
 
   ws.on('message', async (message) => {
     const data = JSON.parse(message);
-    const logMessage = `Received message: ${JSON.stringify(data)}`;
-    // console.log(logMessage);
-    
+
     // Store the log message
+    const logMessage = `Received message: ${JSON.stringify(data)}`;
     logMessages.push(logMessage);
     if (logMessages.length > maxLogs) {
       logMessages.shift(); // Remove the oldest log if limit is reached
     }
 
-    if (data.action === 'startGame') {
-      const { gameId } = data;
-      console.log(`Client subscribed to game ID: ${gameId}`);
-      logMessages.push(`Client subscribed to game ID: ${gameId}`);
-      if (logMessages.length > maxLogs) {
-        logMessages.shift(); 
-      }
+    // Handle game actions (start, pause, resume, end)
+    const { action, gameId } = data;
 
-      clients.set(ws, gameId);
+    if (action === 'startGame') {
+      console.log(`Game ${gameId} started`);
+      if (!gameTimers[gameId]) {
+        gameTimers[gameId] = {
+          startTime: new Date(),
+          paused: false,
+          elapsedTime: 0 // Initialize elapsed time
+        };
+      }
+    } 
+    
+    // Pause the game
+    else if (action === 'pauseGame') {
+      const gameTimer = gameTimers[gameId];
+      if (gameTimer && !gameTimer.paused) {
+        const elapsedTime = (new Date() - gameTimer.startTime) + (gameTimer.elapsedTime || 0); // Calculate elapsed time
+        gameTimers[gameId].paused = true;
+        gameTimers[gameId].elapsedTime = elapsedTime; // Store elapsed time
+        console.log(`Game ${gameId} paused at ${elapsedTime / 1000} seconds`);
+      }
+    } 
+    
+    // Resume the game
+    else if (action === 'resumeGame') {
+      const gameTimer = gameTimers[gameId];
+      if (gameTimer && gameTimer.paused) {
+        gameTimers[gameId].paused = false;
+        gameTimers[gameId].startTime = new Date(); // Reset start time for resuming
+        console.log(`Game ${gameId} resumed`);
+      }
+    } 
+    
+   
+
+    if (action === 'endGame') {
+    if (gameTimers[gameId]) {
+      console.log(`Game ${gameId} ended`);
+      delete gameTimers[gameId]; // Remove the game timer on end
+      // You may want to notify the client that the game has ended
+      ws.send(JSON.stringify({ action: 'gameEnded', gameId })); // Optional: Notify the client
     }
-  });
+  }
+}
+
+
+
+
+);
+
+
 
   ws.on('close', () => {
     console.log('WebSocket connection closed');
     clients.delete(ws);
   });
 });
+
+
+
 
 
 app.get('/api/logs', (req, res) => {
@@ -117,11 +163,21 @@ app.get('/api/logs', (req, res) => {
 
 let gameTimers = {};
 
-// Helper function to calculate elapsed time in "MM:SS" format
-function getElapsedTime(startTime) {
+
+
+
+function getElapsedTime(gameTimer) {
+  if (gameTimer.paused) {
+    return formatElapsedTime(gameTimer.elapsedTime);
+  }
+
   const currentTime = new Date();
-  const diffMs = currentTime - startTime;
-  const diffSeconds = Math.floor(diffMs / 1000);
+  const diffMs = (currentTime - gameTimer.startTime) + (gameTimer.elapsedTime || 0); // Include previously elapsed time
+  return formatElapsedTime(diffMs);
+}
+
+function formatElapsedTime(ms) {
+  const diffSeconds = Math.floor(ms / 1000);
   const minutes = Math.floor(diffSeconds / 60);
   const seconds = diffSeconds % 60;
   return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
@@ -130,17 +186,19 @@ function getElapsedTime(startTime) {
 
 
 
-// Polling API to return game times
+
+
+// // Polling API to return game times
 app.get('/api/game_times', (req, res) => {
   // Log all entries before processing
-  logMessages.forEach((log, index) => {
-    console.log(`Log entry ${index}:`);
-  });
+  // logMessages.forEach((log, index) => {
+  //   console.log(`Log entry ${index}:`, log);
+  // });
 
   // Process log messages and start timers if not already running
   logMessages.forEach(log => {
     try {
-      console.log('Raw log message:'); // Log the raw message
+      // console.log('Raw log message:'); // Log the raw message
 
       // Ensure log is a string
       if (typeof log !== 'string') {
@@ -149,12 +207,12 @@ app.get('/api/game_times', (req, res) => {
 
       // Check if the log message starts with the expected prefix
       if (!log.startsWith('Received message: ')) {
-        console.log('Skipping malformed log message:', log);
+        // console.log('Skipping malformed log message:', log);
         return; // Skip to the next iteration
       }
 
       const parts = log.split('Received message: ');
-      console.log('Split parts:'); // Log the split parts
+      // console.log('Split parts:'); // Log the split parts
 
       // Check if we have a valid message part
       if (parts.length < 2 || !parts[1]) {
@@ -175,26 +233,25 @@ app.get('/api/game_times', (req, res) => {
     }
   });
 
-  // Prepare game updates with elapsed time
+
   const gameUpdates = Object.keys(gameTimers).map(gameId => {
     const gameTimer = gameTimers[gameId];
     return {
       gameId: gameId,
-      elapsedTime: getElapsedTime(gameTimer.startTime)
+      elapsedTime: getElapsedTime(gameTimer) // Use the new function to calculate time
     };
   });
 
+
+  
+  
   // Send the game updates (with elapsed time) to the frontend
   res.json(gameUpdates);
 });
 
 
- app.get('/app/goal_scorers', (req, res) => {
 
-  res.json(logMessages)
-
- })
-
+ 
 
 // Start the server
 server.listen(port, () => {
