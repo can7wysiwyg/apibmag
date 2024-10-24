@@ -100,6 +100,26 @@ SoccerRoute.get('/public_show_game/:id', asyncHandler(async(req, res) => {
 }))
 
 
+
+SoccerRoute.get('/public_show_games_by_league/:id', asyncHandler(async(req, res) => {
+
+
+    try {
+
+        const {id} = req.params
+
+        const gamesFromLeague = await Game.find({leagueName: id})
+
+        res.json({gamesFromLeague})
+
+        
+    } catch (error) {
+        res.json({msg: " there was a problem " + error})
+    }
+}))
+
+
+
 SoccerRoute.get('/public_show_league/:id', asyncHandler(async(req, res) => {
 
 
