@@ -14,6 +14,10 @@ const LeagueSchema = mongoose.Schema({
     endDate: {
         type: String,
         required: true 
+    },
+    hasLogTable: {
+        type: Boolean,
+         default: false
     }
 
 

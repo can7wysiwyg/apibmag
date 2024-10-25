@@ -42,15 +42,16 @@ try {
        asyncHandler(async(req, res) => {   
    try {
 
-    const {startDate, endDate, leagueName} = req.body
+    const {startDate, endDate, leagueName, hasLogTable} = req.body
 
-    if(!endDate || !startDate || !leagueName) res.json({msg: "check for blank input boxes"})
+    if(!endDate || !startDate || !leagueName || !hasLogTable) res.json({msg: "check for blank input boxes"})
 
 
         await League.create({
             leagueName,
             startDate,
-            endDate
+            endDate,
+            hasLogTable
         })
 
         res.json({msg: "successfully created a new league"})
