@@ -132,55 +132,73 @@ wss.on("connection", (ws) => {
         gameTimers[gameId].startTime = new Date(); // Reset start time for resuming
         console.log(`Game ${gameId} resumed`);
       }
-    } else if (action === "endGame") {
+       }
+
+     else if (action === "endGame") {
       const { gameId } = data; // Extract the game ID from the incoming data
-
-      // Assuming you have a Game model to query
-      const game = await Game.findById(gameId); // Fetch game details by ID
-
-      if (game) {
-        const { leagueName } = game; // Extract the league name
-
-        // Initialize teams' structures
-        const teamOne = {
-          name: game.teamOne, // Assuming game.teamOne contains the team's name
-          score: 0,
-          scorers: [],
-        };
-
-        const teamTwo = {
-          name: game.teamTwo, // Assuming game.teamTwo contains the team's name
-          score: 0,
-          scorers: [],
-        };
-
-        // Process log messages to get scores and scorers
-        logMessages.forEach((log) => {
-          const message = JSON.parse(log);
-
-          if (message.action === "updateGoals" && message.gameId === gameId) {
-            // Update scores and scorers based on log message
-            teamOne.score = message.teamOneScore;
-            teamTwo.score = message.teamTwoScore;
-            teamOne.scorers.push(...message.teamOneScorers); // Add scorers
-            teamTwo.scorers.push(...message.teamTwoScorers);
-          }
-        });
-
-        // Save to the new GameResult model
-        const gameResult = new GameResult({
-          leagueName,
-          teamOne,
-          teamTwo,
-        });
-
-        await gameResult.save();
-
-        await Game.findByIdAndDelete(gameId);
-        console.log(`Game ${gameId} results saved.`);
+  
+      // Fetch all games
+      const games = await Game.find(); 
+  
+      // Find the specific game that needs to be processed
+      const singleGame = games.flatMap(game => game.games).find(item => item._id.toString() === gameId);
+      
+      if (singleGame) {
+          const { leagueName } = singleGame; 
+  
+          // Initialize teams' structures
+          const teamOne = {
+              name: singleGame.teamOne, // Replace with actual reference to team name
+              score: 0,
+              scorers: [],
+          };
+  
+          const teamTwo = {
+              name: singleGame.teamTwo, // Replace with actual reference to team name
+              score: 0,
+              scorers: [],
+          };
+  
+          // Process log messages to get scores and scorers
+          logMessages.forEach((log) => {
+              const message = JSON.parse(log);
+  
+              if (message.action === "updateGoals" && message.gameId === gameId) {
+                  // Update scores and scorers based on log message
+                  teamOne.score = message.teamOneScore;
+                  teamTwo.score = message.teamTwoScore;
+                  teamOne.scorers.push(...message.teamOneScorers); // Add scorers
+                  teamTwo.scorers.push(...message.teamTwoScorers);
+              }
+          });
+  
+          // Save to the new GameResult model
+          const gameResult = new GameResult({
+              leagueName,
+              teamOne,
+              teamTwo,
+          });
+  
+          await gameResult.save();
+  
+          // Now remove the game from the parent document
+          await Game.updateMany(
+              {}, // Update the first document found
+              { $pull: { games: { _id: gameId } } } // Pull the game from the games array
+          );
+  
+          console.log(`Game ${gameId} results saved and game deleted.`);
+      } else {
+          console.log(`Game ${gameId} not found.`);
       }
-    }
-  });
+  }
+  
+
+
+
+ }
+
+);
 
   ws.on("close", () => {
     console.log("WebSocket connection closed");

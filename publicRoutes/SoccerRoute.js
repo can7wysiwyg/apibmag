@@ -82,22 +82,27 @@ SoccerRoute.get('/public_show_team/:id', asyncHandler(async(req, res) => {
 
 
 
-SoccerRoute.get('/public_show_game/:id', asyncHandler(async(req, res) => {
-
-
+SoccerRoute.get('/public_show_game/:id', asyncHandler(async (req, res) => {
     try {
+        const { id } = req.params; // Get the match ID from the URL parameters
 
-        const {id} = req.params
+        // Fetch all game documents (or optimize as needed)
+        const games = await Game.find();
 
-        const game = await Game.findById(id)
+        // Flatten the games array from all documents to find the specific match
+        const game = games.flatMap(game => game.games).find(item => item._id.toString() === id);
 
-        res.json({game})
+        if (!game) {
+            return res.json({ msg: "Match not found" });
+        }
 
-        
+        res.json({game });
     } catch (error) {
-        res.json({msg: " there was a problem " + error})
+        res.json({ msg: "There was a problem: " + error });
     }
-}))
+}));
+
+
 
 
 

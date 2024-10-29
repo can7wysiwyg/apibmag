@@ -26,7 +26,7 @@ const compSchema = new mongoose.Schema({
         required: true
     },
     
-}, { _id: false });
+}, { _id: true });
 
 // Define the League schema with games as an array of GameSchema
 const gameSchema = new mongoose.Schema({
