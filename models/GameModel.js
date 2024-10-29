@@ -1,19 +1,17 @@
-const mongoose = require('mongoose')
+const mongoose = require('mongoose');
 
-const GameSchema = mongoose.Schema({
-
+// Define the Game subdocument schema
+const compSchema = new mongoose.Schema({
     teamOne: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Team',
         required: true
     },
-
     teamTwo: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Team',
         required: true
     },
-
     leagueName: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'League',
@@ -22,23 +20,23 @@ const GameSchema = mongoose.Schema({
     gameVenue: {
         type: String,
         required: true
-
     },
     gameTime: {
         type: String,
         required: true
-
     },
+    
+}, { _id: false });
 
-    gameResult: {
+// Define the League schema with games as an array of GameSchema
+const gameSchema = new mongoose.Schema({
+    leagueName: {
         type: String,
-        default: null
-    }
-
-
+        required: true
+    },
+    games: [compSchema]  // Embed GameSchema as an array within the LeagueSchema
 }, {
     timestamps: true
-})
+});
 
-
-module.exports = mongoose.model('Game', GameSchema)
+module.exports = mongoose.model('Game', gameSchema);
