@@ -21,4 +21,22 @@ TableRoute.get('/table_get_single/:id', asyncHandler(async(req, res) => {
 }))
 
 
+TableRoute.get('/tables_all', asyncHandler(async(req, res) => {
+
+    try {
+
+        
+        const tables = await Table.find()
+
+        res.json({tables})
+        
+    } catch (error) {
+        res.json({msg: `there was a problem ${error}`})
+    }
+
+
+}))
+
+
+
 module.exports = TableRoute
