@@ -153,27 +153,77 @@ AdminSoccerRoute.put(
   })
 );
 
+
 AdminSoccerRoute.put(
   "/admin_game_update/:id",
   verifyAdmin,
   authAdmin,
   asyncHandler(async (req, res) => {
     try {
-      const { id } = req.params;
+      const { id } = req.params; // The ID of the game to be updated
+      const updateData = req.body; // The data to update the game with
 
-      const gameExists = await Game.findById(id);
+      // Find the parent document containing the game to be updated
+      const gameDocument = await Game.findOne({ "games._id": id });
 
-      if (!gameExists) res.json({ msg: "object does not exists" });
+      if (!gameDocument) {
+        return res.json({ msg: "Game does not exist" });
+      }
 
-      await Game.findByIdAndUpdate(id, req.body, { new: true });
+      // Update the specific game in the games array
+      const updatedGame = await Game.updateOne(
+        { "games._id": id }, // Find the document with the specific game ID
+        { $set: { "games.$": updateData } }, // Use $set to update the specific game
+        { new: true } // This option does not apply to updateOne but is here for reference
+      );
 
-      res.json({ msg: "successfully updated the game!" });
+      if (updatedGame.modifiedCount === 0) {
+        return res.json({ msg: "No changes made" });
+      }
+
+      res.json({ msg: "Successfully updated the game!" });
     } catch (error) {
-      res.json({ msg: `there was an error in updating the game: ${error}` });
+      res.json({ msg: `There was an error in updating the game: ${error.message}` });
     }
   })
 );
 
+
+
 // END TEAM UPDATE ROUTES
+
+
+// DELETE ROUTES
+
+AdminSoccerRoute.delete('/admin_erase_game/:id', verifyAdmin, authAdmin,   asyncHandler(async(req, res) => {
+
+   
+  try {
+
+    const { id } = req.params;
+
+    // Find the document that contains the specific game to delete
+    const gameDocument = await Game.findOne({ "games._id": id });
+
+    if (!gameDocument) {
+      return res.json({ msg: "Game not found" });
+    }
+
+    // Remove the specific game from the games array
+    await Game.findOneAndUpdate(
+      { "games._id": id }, // Query to find the correct document
+      { $pull: { games: { _id: id } } } // Remove the game from the array
+    );
+
+    res.json({ msg: "Successfully deleted the game!" });
+
+
+    
+  } catch (error) {
+    res.json({msg: `there was an error: ${error}`})
+  }
+
+
+}))
 
 module.exports = AdminSoccerRoute;
