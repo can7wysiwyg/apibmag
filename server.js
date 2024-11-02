@@ -112,6 +112,18 @@ wss.on("connection", (ws) => {
       }
     }
 
+    else if (action === "gameMessages") {
+      const { half, addedMinutes } = data; // Extract half and addedMinutes
+      console.log(`Received game message for game ID: ${gameId}, Half: ${half}, Added Minutes: ${addedMinutes}`);
+    
+      // Update the game details with added minutes and current half
+      const gameDetails = gameTimers[gameId] || {};
+      gameDetails.half = half; // Store the current half
+      gameDetails.addedMinutes = addedMinutes; // Store added minutes
+      gameTimers[gameId] = gameDetails; // Update game details
+    }
+    
+
     // Pause the game
     else if (action === "pauseGame") {
       const gameTimer = gameTimers[gameId];
