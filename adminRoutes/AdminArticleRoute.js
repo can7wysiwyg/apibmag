@@ -12,13 +12,44 @@ cloudinary.config({
   api_secret: process.env.API_SECRET,
 });
 
+// AdminArticleRoute.get(
+//   "/adminarticle/most_viewed_articles",
+//   verifyAdmin,
+//   authAdmin,
+//   asyncHandler(async (req, res) => {
+//     try {
+//     const articleCounts = await Article.find()
+
+//     } catch (error) {
+//       res.json({ msg: "there was a problem" });
+//     }
+//   })
+// );
+
+
+AdminArticleRoute.get(
+  "/adminarticle/most_viewed_articles",
+  verifyAdmin,
+  authAdmin,
+  
+  asyncHandler(async (req, res) => {
+    try {
+      const articles = await Article.find()
+        .select('articleTitle articleClicks')
+        .sort({ articleClicks: -1 }); // -1 for descending order
+      res.json(articles);
+    } catch (error) {
+      res.status(500).json({ msg: "there was a problem" });
+    }
+  })
+);
+
 AdminArticleRoute.post(
   "/adminarticleroute/create_new_article",
   verifyAdmin,
   authAdmin,
   asyncHandler(async (req, res, next) => {
     try {
-      
       const { articleCategory, articleContent, articleAuthor, articleTitle } =
         req.body;
 
@@ -46,7 +77,7 @@ AdminArticleRoute.post(
         articleCategory,
         articleContent,
         articleTitle,
-        
+
         articlePhoto: articlePhotoResult.secure_url,
       });
 
