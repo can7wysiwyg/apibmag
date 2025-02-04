@@ -94,6 +94,35 @@ ArticleRoute.get('/articleroute/articles_by_genre/:id', asyncHandler(async(req, 
 }))
 
 
+// ArticleRoute.put('/articleroute/update_article_clicks/:id', asyncHandler(async(req, res) => {
+//     try {
+//         const {id} = req.params;
+//         console.log(req.body)
+//         const updatedArticle = await Article.findByIdAndUpdate(
+//             id, 
+//             { articleClicks: req.body.articleClicks },
+//             { new: true }
+//         );
+//     res.json(updatedArticle)
+//     } catch (error) {
+//         res.status(500).json({msg: "there was a problem"});
+//     }
+// }))
+
+
+ArticleRoute.put('/articleroute/update_article_clicks/:id', asyncHandler(async(req, res) => {
+    try {
+        const {id} = req.params;
+         await Article.findByIdAndUpdate(
+            id, 
+            { $inc: { articleClicks: 1 } },  // Increment by 1
+            { new: true }
+        );
+    
+    } catch (error) {
+        res.status(500).json({msg: "there was a problem"});
+    }
+}))
 
 
 module.exports = ArticleRoute

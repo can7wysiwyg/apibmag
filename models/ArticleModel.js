@@ -21,6 +21,11 @@ const ArticleSchema = mongoose.Schema({
     articleCategory: {
         type: String,
         required: true
+    },
+    articleClicks: {
+        type: Number,
+        default: 0
+
     }
 
 
