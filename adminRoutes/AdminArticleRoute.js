@@ -12,20 +12,6 @@ cloudinary.config({
   api_secret: process.env.API_SECRET,
 });
 
-// AdminArticleRoute.get(
-//   "/adminarticle/most_viewed_articles",
-//   verifyAdmin,
-//   authAdmin,
-//   asyncHandler(async (req, res) => {
-//     try {
-//     const articleCounts = await Article.find()
-
-//     } catch (error) {
-//       res.json({ msg: "there was a problem" });
-//     }
-//   })
-// );
-
 
 AdminArticleRoute.get(
   "/adminarticle/most_viewed_articles",

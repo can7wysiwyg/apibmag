@@ -3,39 +3,17 @@ const asyncHandler = require('express-async-handler')
 const Article = require('../models/ArticleModel')
 
 
-ArticleRoute.get('/articleroute/articles_by_magazineissue/:id', asyncHandler(async(req, res, next) => {
+
+ArticleRoute.get('/articleroute/article_single/:id', asyncHandler(async(req, res, next) => {
 
 
     try {
    
          const {id} = req.params
 
-         const articlesByIssue = await Article.find({articleIssueMonthRef: id})
+         const articleSingle = await Article.findById({_id: id})
 
-         res.json({articlesByIssue})
-
-
-        
-    } catch (error) {
-        next(error)
-    }
-
-
-
-}))
-
-
-
-ArticleRoute.get('/articleroute/article_by_magazineissue/:id', asyncHandler(async(req, res, next) => {
-
-
-    try {
-   
-         const {id} = req.params
-
-         const articleByIssue = await Article.findById({_id: id})
-
-         res.json({articleByIssue})
+         res.json({articleSingle})
 
 
         

@@ -8,7 +8,7 @@ MagIssuesRoute.get("/magissueroute/show_recent_issue", asyncHandler(async(req, r
 
     try {
 
-        const newIssue = await Magazine.find().sort({_id: -1}).limit(1)
+        const newIssue = await Magazine.find.sort({_id: -1}).limit(1)
 
 
     res.json({newIssue})
