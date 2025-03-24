@@ -76,8 +76,7 @@ AdminMagaRoute.post(
 
 
 
-
-AdminMagaRoute.get('/adminmagaroute/new_issue', verifyAdmin, authAdmin, asyncHandler(async(req, res, next) => {
+AdminMagaRoute.get('/adminmagaroute/new_issue', verifyAdmin, authAdmin,  asyncHandler(async(req, res, next) => {
 
 
   try {

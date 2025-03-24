@@ -56,24 +56,6 @@ AdminVideoRoute.post(
     })
 );
 
-AdminVideoRoute.put('/update_video/:id', verifyAdmin, authAdmin, asyncHandler(async(req, res) => {
-
-    
-try {
-    
-} catch (error) {
-
-    console.error(error);
-            res.json({ message: 'Failed to upload video.', error: error.message });
-    
-}
-
-
-}))
-
-
-// verifyAdmin,
-//     authAdmin,
 AdminVideoRoute.put(
     '/update_video/:id',
      verifyAdmin,
