@@ -226,4 +226,48 @@ AdminSoccerRoute.delete('/admin_erase_game/:id', verifyAdmin, authAdmin,   async
 
 }))
 
+AdminSoccerRoute.delete(`/admin_erase_team/:id`, verifyAdmin, authAdmin, async(req, res) => {
+
+  try {
+
+    const {id} = req.params
+
+    await Team.findByIdAndDelete(id)
+
+    res.json({msg: "successfully deleted"})
+
+    
+  } catch (error) {
+    res.json({msg: "failure deleting team"})
+  }
+
+
+})
+
+
+AdminSoccerRoute.delete(`/admin_erase_league/:id`, verifyAdmin, authAdmin, async(req, res) => {
+
+  try {
+
+    const {id} = req.params
+
+    await League.findByIdAndDelete(id)
+
+    await Game.deleteMany({
+      leagueName: id
+    })
+
+    
+
+    res.json({msg: "successfully deleted"})
+    
+    
+  } catch (error) {
+    res.json({msg: "failure deleting league"})
+  }
+
+
+})
+
+
 module.exports = AdminSoccerRoute;

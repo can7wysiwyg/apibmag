@@ -81,5 +81,22 @@ AdminTableRoute.put("/update_table/:id", verifyAdmin, authAdmin, asyncHandler(as
 }));
 
 
+AdminTableRoute.delete(`/erase_table_admin/:id`, verifyAdmin, authAdmin, async(req, res) => {
+
+    try {
+
+        const {id} = req.params
+
+        await Table.findByIdAndDelete(id)
+
+        res.json({msg: "Table deleted successfully"})
+        
+    } catch (error) {
+        res.json({msg: `failure to delete table ${error}`})
+    }
+
+
+})
+
 
 module.exports = AdminTableRoute
