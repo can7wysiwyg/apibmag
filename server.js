@@ -31,6 +31,7 @@ const AdminTableRoute = require("./adminRoutes/AdminTableRoute");
 const TableRoute = require("./publicRoutes/TableRoute");
 const ResultRoute = require("./publicRoutes/ResultRoute");
 const CommentRoute = require("./publicRoutes/CommentRoute");
+const AdminComments = require("./adminRoutes/AdminComments");
 
 // MongoDB connection
 mongoose.connect(process.env.MONGO_DEVT_URL);
@@ -75,6 +76,7 @@ app.use(AdminTableRoute)
 app.use(TableRoute)
 app.use(ResultRoute)
 app.use(CommentRoute)
+app.use(AdminComments)
 // Create an HTTP server and attach WebSocket to it
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
